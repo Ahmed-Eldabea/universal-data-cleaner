@@ -13,8 +13,9 @@ st.set_page_config(
     page_icon="🤖",
     layout="wide"
 )
+
 # ---------------------------------------------------------
-# Custom CSS to make download buttons prominent
+# Custom CSS for UI and Download Buttons Styling
 # ---------------------------------------------------------
 st.markdown("""
     <style>
@@ -62,6 +63,7 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+
 # ---------------------------------------------------------
 # Smart Detection & Cleaning Logic
 # ---------------------------------------------------------
@@ -126,23 +128,23 @@ def process_dataframe(df, default_country="US", custom_dedup_col=None):
     return df_clean, initial_rows, removed_duplicates, dedup_by
 
 # ---------------------------------------------------------
-# PDF Report Generator (Fixed Full Data & No Text Truncation)
+# PDF Report Generator (Fixed Layout & Safe Widths)
 # ---------------------------------------------------------
 class PDFReport(FPDF):
     def header(self):
         self.set_font("Helvetica", 'B', 15)
         self.set_text_color(31, 58, 147)
-        self.cell(0, 8, "Data Pipeline Analytics & Full Data Report", ln=True, align='C')
+        self.cell(190, 8, "Data Pipeline Analytics & Full Data Report", ln=True, align='C')
         self.set_font("Helvetica", 'I', 8)
         self.set_text_color(120, 120, 120)
-        self.cell(0, 4, "Complete Dataset Audit & Cleaned Records Export", ln=True, align='C')
+        self.cell(190, 4, "Complete Dataset Audit & Cleaned Records Export", ln=True, align='C')
         self.ln(4)
 
     def footer(self):
         self.set_y(-12)
         self.set_font("Helvetica", 'I', 8)
         self.set_text_color(150, 150, 150)
-        self.cell(0, 8, f"Page {self.page_no()}", align='C')
+        self.cell(190, 8, f"Page {self.page_no()}", align='C')
 
 def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
     pdf = PDFReport(orientation='P', unit='mm', format='A4')
@@ -157,7 +159,7 @@ def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
     # Section 1: Executive Metrics Summary
     pdf.set_font("Helvetica", 'B', 11)
     pdf.set_text_color(0, 0, 0)
-    pdf.cell(0, 6, "1. Executive Pipeline Summary", ln=True)
+    pdf.cell(190, 6, "1. Executive Pipeline Summary", ln=True)
     
     metrics_data = [
         ("Total Raw Input Records:", str(initial_rows)),
@@ -176,20 +178,20 @@ def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
 
     # Section 2: Key Data Insights
     pdf.set_font("Helvetica", 'B', 11)
-    pdf.cell(0, 6, "2. Key Data Insights & Field Distribution", ln=True)
+    pdf.cell(190, 6, "2. Key Data Insights & Field Distribution", ln=True)
     pdf.set_font("Helvetica", size=9)
     
     for col in cleaned_df.columns:
         unique_vals = cleaned_df[col].nunique()
         top_val = cleaned_df[col].mode()[0] if not cleaned_df[col].empty else "N/A"
-        insight_text = f"- Field '{col}': {unique_vals} unique values. Top entry: '{top_val}'."
-        pdf.multi_cell(0, 5, insight_text)
+        insight_text = f"- Field '{col}': {unique_vals} unique values. Top entry: '{str(top_val)[:40]}'."
+        pdf.multi_cell(190, 5, insight_text)
         
     pdf.ln(4)
 
-    # Section 3: COMPLETE Cleaned Dataset Records (Full Data without Truncation)
+    # Section 3: COMPLETE Cleaned Dataset Records (Full Data)
     pdf.set_font("Helvetica", 'B', 11)
-    pdf.cell(0, 6, f"3. Complete Cleaned Dataset Records ({cleaned_rows} rows)", ln=True)
+    pdf.cell(190, 6, f"3. Complete Cleaned Dataset Records ({cleaned_rows} rows)", ln=True)
     
     cols = list(cleaned_df.columns)
     total_width = 190
@@ -199,15 +201,15 @@ def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
     pdf.set_font("Helvetica", 'B', 8)
     pdf.set_fill_color(220, 230, 242)
     for col in cols:
-        pdf.cell(col_width, 6, str(col), border=1, fill=True, align='C')
+        pdf.cell(col_width, 6, str(col)[:15], border=1, fill=True, align='C')
     pdf.ln()
 
-    # Table Rows (Loops through ALL rows, showing full text without [:15] restriction)
+    # Table Rows
     pdf.set_font("Helvetica", size=7)
     for _, row in cleaned_df.iterrows():
         for col in cols:
             val_str = str(row[col]) if not pd.isna(row[col]) else ""
-            pdf.cell(col_width, 5, val_str, border=1, align='L') # تم إزالة قيد القص لظهر الإيميل كاملاً
+            pdf.cell(col_width, 5, val_str[:25], border=1, align='L')
         pdf.ln()
 
     return pdf.output(dest='S').encode('latin-1')
@@ -306,3 +308,6 @@ if uploaded_file:
             file_name="Executive_Data_Analytics_Report.pdf",
             mime="application/pdf"
         )
+
+else:
+    st.info("👈 Please upload any CSV or Excel file from the sidebar to test the pipeline.")
