@@ -1,0 +1,6 @@
+pandas
+phonenumbers
+streamlit
+plotly
+fpdf2
+openpyxl
