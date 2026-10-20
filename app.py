@@ -153,7 +153,7 @@ def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
     pdf.set_right_margin(10)
     
     cleaned_rows = len(cleaned_df)
-    efficiency_rate = f"{((cleaned_rows/initial_rows)*100):.1f}%" if initial_rows > 0 else "0%"
+    efficiency_rate = f"{((cleaned_rows / initial_rows) * 100):.1f}%" if initial_rows > 0 else "0%"
     
     # Section 1: Executive Metrics Summary
     pdf.set_font("Helvetica", 'B', 11)
@@ -211,8 +211,8 @@ def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
             pdf.cell(col_width, 5, val_str[:25], border=1, align='L')
         pdf.ln()
 
-    return pdf.output()
-
+    # Safe return for FPDF2 latest versions (returns bytes directly)
+    return bytes(pdf.output())
 # ---------------------------------------------------------
 # UI Main Layout
 # ---------------------------------------------------------
