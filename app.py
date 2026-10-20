@@ -128,7 +128,7 @@ def process_dataframe(df, default_country="US", custom_dedup_col=None):
     return df_clean, initial_rows, removed_duplicates, dedup_by
 
 # ---------------------------------------------------------
-# PDF Report Generator (Fixed Layout & Safe Widths)
+# PDF Report Generator (Optimized for Full Insights & Emails)
 # ---------------------------------------------------------
 class PDFReport(FPDF):
     def header(self):
@@ -145,6 +145,7 @@ class PDFReport(FPDF):
         self.set_font("Helvetica", 'I', 8)
         self.set_text_color(150, 150, 150)
         self.cell(190, 8, f"Page {self.page_no()}", align='C')
+
 def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
     pdf = PDFReport(orientation='P', unit='mm', format='A4')
     pdf.add_page()
@@ -175,7 +176,7 @@ def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
         
     pdf.ln(4)
 
-    # Section 2: Key Data Insights
+    # Section 2: Key Data Insights (Expanded text length limit to 80 characters)
     pdf.set_font("Helvetica", 'B', 11)
     pdf.cell(190, 6, "2. Key Data Insights & Field Distribution", ln=True)
     pdf.set_font("Helvetica", size=9)
@@ -183,7 +184,7 @@ def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
     for col in cleaned_df.columns:
         unique_vals = cleaned_df[col].nunique()
         top_val = cleaned_df[col].mode()[0] if not cleaned_df[col].empty else "N/A"
-        insight_text = f"- Field '{col}': {unique_vals} unique values. Top entry: '{str(top_val)[:40]}'."
+        insight_text = f"- Field '{col}': {unique_vals} unique values. Top entry: '{str(top_val)[:80]}'."
         pdf.multi_cell(190, 5, insight_text)
         
     pdf.ln(4)
@@ -200,19 +201,20 @@ def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
     pdf.set_font("Helvetica", 'B', 8)
     pdf.set_fill_color(220, 230, 242)
     for col in cols:
-        pdf.cell(col_width, 6, str(col)[:15], border=1, fill=True, align='C')
+        pdf.cell(col_width, 6, str(col)[:18], border=1, fill=True, align='C')
     pdf.ln()
 
-    # Table Rows
+    # Table Rows (Increased character limit to 50 to display long emails fully)
     pdf.set_font("Helvetica", size=7)
     for _, row in cleaned_df.iterrows():
         for col in cols:
             val_str = str(row[col]) if not pd.isna(row[col]) else ""
-            pdf.cell(col_width, 5, val_str[:25], border=1, align='L')
+            pdf.cell(col_width, 5, val_str[:50], border=1, align='L')
         pdf.ln()
 
     # Safe return for FPDF2 latest versions (returns bytes directly)
     return bytes(pdf.output())
+
 # ---------------------------------------------------------
 # UI Main Layout
 # ---------------------------------------------------------
