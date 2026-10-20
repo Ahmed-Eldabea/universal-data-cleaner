@@ -145,8 +145,9 @@ class PDFReport(FPDF):
         self.cell(0, 8, f"Page {self.page_no()}", align='C')
 
 def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
-    pdf = PDFReport()
+    pdf = PDFReport(orientation='P', unit='mm', format='A4')
     pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
     pdf.set_left_margin(10)
     pdf.set_right_margin(10)
     
