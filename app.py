@@ -145,7 +145,6 @@ class PDFReport(FPDF):
         self.set_font("Helvetica", 'I', 8)
         self.set_text_color(150, 150, 150)
         self.cell(190, 8, f"Page {self.page_no()}", align='C')
-
 def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
     pdf = PDFReport(orientation='P', unit='mm', format='A4')
     pdf.add_page()
@@ -212,7 +211,7 @@ def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
             pdf.cell(col_width, 5, val_str[:25], border=1, align='L')
         pdf.ln()
 
-    return pdf.output(dest='S').encode('latin-1')
+    return pdf.output()
 
 # ---------------------------------------------------------
 # UI Main Layout
