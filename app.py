@@ -184,7 +184,8 @@ def generate_pdf_report(initial_rows, cleaned_df, removed_dupes):
     for col in cleaned_df.columns:
         unique_vals = cleaned_df[col].nunique()
         top_val = cleaned_df[col].mode()[0] if not cleaned_df[col].empty else "N/A"
-        insight_text = f"• Field '{col}': {unique_vals} unique values | Top entry: '{str(top_val)[:60]}'"
+        # استبدال الرمز الخاص بـ شرطة عادية آمنة للترميز
+        insight_text = f"- Field '{col}': {unique_vals} unique values | Top entry: '{str(top_val)[:60]}'"
         pdf.cell(190, 5, insight_text, ln=True)
         
     pdf.ln(4)
